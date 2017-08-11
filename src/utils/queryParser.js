@@ -15,13 +15,7 @@
  *
  */
 
-export const toQueryUrl = query => Object
-    .keys(query)
-    .filter(key => query[key])
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
-    .join('&');
-
-export const toQuery = (query) => {
+function parseQueryUrl(query) {
     const queryDict = {};
 
     if (!query || query.length <= 1) return {};
@@ -32,4 +26,26 @@ export const toQuery = (query) => {
             queryDict[decodeURIComponent(item.split('=')[0])] = decodeURIComponent(item.split('=')[1]);
         });
     return queryDict;
+}
+
+export const toQuery = (query, match) => {
+    const queryDict = parseQueryUrl(query);
+
+    // set defaults timerange if not present already
+    if (!(queryDict.timePreset || (queryDict.startTime && queryDict.endTime))) {
+        queryDict.timePreset = '5m';
+    }
+
+    // set serviceName using path param if query doesnt have serviceName key
+    if (!query.serviceName) {
+        queryDict.serviceName = match.params.serviceName;
+    }
+
+    return queryDict;
 };
+
+export const toQueryUrl = query => Object
+    .keys(query)
+    .filter(key => query[key])
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
+    .join('&');

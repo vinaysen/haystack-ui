@@ -33,23 +33,15 @@ export default class SearchBar extends React.Component {
     constructor(props) {
         super(props);
 
-        // set state
-        const query = toQuery(props.location.search);
-
-        // set defaults timerange if not present already
-        if (!(query.timePreset || (query.startTime && query.endTime))) {
-            query.timePreset = '5m';
-        }
-        if (!query.serviceName) {
-            query.serviceName = props.match.params.serviceName;
-        }
-        this.state = {query};
-
         // bind functions
         this.fetchSearchResults = this.fetchSearchResults.bind(this);
         this.searchCallback = this.searchCallback.bind(this);
 
-        // trigger search
+        // construct query object along with defaults
+        const query = toQuery(props.location.search, props.match);
+
+        // update state and initiate trace search
+        this.state = {query};
         this.fetchSearchResults(query);
     }
 
@@ -57,8 +49,9 @@ export default class SearchBar extends React.Component {
         if (this.isTriggeredThroughSearchBar) {
             this.isTriggeredThroughSearchBar = false;
         } else {
-            const query = toQuery(nextProps.location.search);
+            const query = toQuery(nextProps.location.search, this.props.match);
 
+            // update state and initiate trace search
             this.setState({query});
             this.fetchSearchResults(query);
         }
@@ -69,10 +62,8 @@ export default class SearchBar extends React.Component {
     }
 
     searchCallback(query) {
-        this.setState({query});
-
-        const queryUrl = `?${toQueryUrl(query)}`;
         // push to history only if it is not the same search as the current one
+        const queryUrl = `?${toQueryUrl(query)}`;
         if (queryUrl !== this.props.location.search) {
             this.isTriggeredThroughSearchBar = true;
             this.props.history.push({
@@ -80,6 +71,8 @@ export default class SearchBar extends React.Component {
             });
         }
 
+        // update state and initiate trace search
+        this.setState({query});
         this.fetchSearchResults(query);
     }
 
