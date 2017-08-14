@@ -53,14 +53,13 @@ export default class SearchQueryBar extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = SearchQueryBar.createStateUsingQuery(props.query);
-
         this.handleQueryStringChange = this.handleQueryStringChange.bind(this);
         this.handleTimeRangePicker = this.handleTimeRangePicker.bind(this);
-        this.handleTimeRangeSelect = this.handleTimeRangeSelect.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.timeRangeChangeCallback = this.timeRangeChangeCallback.bind(this);
         this.search = this.search.bind(this);
+
+        this.state = SearchQueryBar.createStateUsingQuery(props.query);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -72,18 +71,7 @@ export default class SearchQueryBar extends React.Component {
     }
 
     handleTimeRangePicker() {
-        if (this.state.showTimeRangePicker) {
-            this.setState({showTimeRangePicker: false});
-        } else {
-            this.setState({showTimeRangePicker: true});
-        }
-    }
-
-    handleTimeRangeSelect(timeRange, optionType) {
-        this.setState({
-            timeRangeSelected: timeRange,
-            timeRangeType: optionType
-        });
+        this.setState({showTimeRangePicker: !this.state.showTimeRangePicker});
     }
 
     handleSubmit(event) {
@@ -128,6 +116,9 @@ export default class SearchQueryBar extends React.Component {
                             onClick={this.handleTimeRangePicker}
                         >
                             {this.state.timeRangePickerToggleText}
+                            { this.state.showTimeRangePicker
+                                ? ' ▲'
+                                : ' ▼' }
                         </button>
                     </span>
                     <span className="input-group-btn">
